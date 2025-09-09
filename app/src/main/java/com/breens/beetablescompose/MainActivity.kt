@@ -87,10 +87,18 @@ fun MainUi(modifier: Modifier = Modifier) {
         var increaseColumnWidth by remember {
             mutableStateOf<Int?>(null)
         }
+
+        var enableEditing by remember {
+            mutableStateOf(false)
+        }
+
+        var editableTeams by remember {
+            mutableStateOf(premierLeagueTeams.toMutableList())
+        }
         LazyColumn(contentPadding = PaddingValues(16.dp)) {
             item {
                 BeeTablesCompose(
-                    data = premierLeagueTeams,
+                    data = editableTeams,
                     enableTableHeaderTitles = enableHeaderTitles,
                     disableVerticalDividers = disableVerticalDividers,
                     dividerThickness = horizontalDividerThickness.dp,
@@ -103,6 +111,19 @@ fun MainUi(modifier: Modifier = Modifier) {
                     ),
                     contentAlignment = if (centerContent) Alignment.Center else Alignment.CenterStart,
                     textAlign = if (centerTextAlignment) TextAlign.Center else TextAlign.Start,
+                    enableCellEditing = enableEditing,
+                    onDataChange = { rowIndex, columnIndex, newValue ->
+                        val updatedTeam = when (columnIndex) {
+                            0 -> editableTeams[rowIndex].copy(name = newValue)
+                            1 -> editableTeams[rowIndex].copy(homeWins = newValue)
+                            2 -> editableTeams[rowIndex].copy(awayWins = newValue)
+                            3 -> editableTeams[rowIndex].copy(totalPoints = newValue)
+                            else -> editableTeams[rowIndex]
+                        }
+                        editableTeams = editableTeams.toMutableList().apply {
+                            set(rowIndex, updatedTeam)
+                        }
+                    },
                 )
             }
 
@@ -270,6 +291,27 @@ fun MainUi(modifier: Modifier = Modifier) {
                         )
                     }
                 }
+            }
+
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Text(
+                        text = "Enable Cell Editing",
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Switch(
+                        checked = enableEditing,
+                        onCheckedChange = {
+                            enableEditing = it
+                        },
+                    )
+                }
+
+                Spacer(modifier = Modifier.padding(12.dp))
             }
         }
     }

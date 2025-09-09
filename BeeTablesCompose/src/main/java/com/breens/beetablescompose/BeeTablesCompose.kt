@@ -28,6 +28,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.breens.beetablescompose.components.EditableTableRowComponent
 import com.breens.beetablescompose.components.TableHeaderComponent
 import com.breens.beetablescompose.components.TableHeaderComponentWithoutColumnDividers
 import com.breens.beetablescompose.components.TableRowComponent
@@ -57,6 +58,8 @@ import com.breens.beetablescompose.utils.lightGray
  * @param horizontalDividerColor The color of the horizontal dividers, by default it will be [Color.LightGray]. Note: This will only be visible if [disableVerticalDividers] is set to true.
  * @param contentAlignment The alignment of the content in the table cells, by default it will be [Alignment.Center].
  * @param textAlign The alignment of the text in the table cells, by default it will be [TextAlign.Center].
+ * @param enableCellEditing Enable or disable cell editing functionality, by default it will be false.
+ * @param onDataChange Callback function that will be called when cell data is changed. Only used when [enableCellEditing] is true.
  */
 @Composable
 inline fun <reified T : Any> BeeTablesCompose(
@@ -85,6 +88,8 @@ inline fun <reified T : Any> BeeTablesCompose(
     textAlign: TextAlign = TextAlign.Center,
     tablePadding: Dp = 0.dp,
     columnToIndexIncreaseWidth: Int? = null,
+    enableCellEditing: Boolean = false,
+    noinline onDataChange: ((rowIndex: Int, columnIndex: Int, newValue: String) -> Unit)? = null,
 ) {
     OutlinedCard(
         elevation = CardDefaults.cardElevation(defaultElevation = tableElevation),
@@ -131,21 +136,10 @@ inline fun <reified T : Any> BeeTablesCompose(
                     tableRowColors[1]
                 }
 
-                if (disableVerticalDividers) {
-                    TableRowComponentWithoutDividers(
+                if (enableCellEditing) {
+                    EditableTableRowComponent(
                         data = rowData,
-                        rowTextStyle = rowTextStyle,
-                        rowBackGroundColor = tableRowBackgroundColor,
-                        dividerThickness = dividerThickness,
-                        horizontalDividerColor = horizontalDividerColor,
-                        contentAlignment = contentAlignment,
-                        textAlign = textAlign,
-                        tablePadding = tablePadding,
-                        columnToIndexIncreaseWidth = columnToIndexIncreaseWidth,
-                    )
-                } else {
-                    TableRowComponent(
-                        data = rowData,
+                        rowIndex = index,
                         rowBorderColor = rowBorderColor,
                         dividerThickness = dividerThickness,
                         rowTextStyle = rowTextStyle,
@@ -154,7 +148,36 @@ inline fun <reified T : Any> BeeTablesCompose(
                         textAlign = textAlign,
                         tablePadding = tablePadding,
                         columnToIndexIncreaseWidth = columnToIndexIncreaseWidth,
+                        disableVerticalDividers = disableVerticalDividers,
+                        horizontalDividerColor = horizontalDividerColor,
+                        onDataChange = onDataChange,
                     )
+                } else {
+                    if (disableVerticalDividers) {
+                        TableRowComponentWithoutDividers(
+                            data = rowData,
+                            rowTextStyle = rowTextStyle,
+                            rowBackGroundColor = tableRowBackgroundColor,
+                            dividerThickness = dividerThickness,
+                            horizontalDividerColor = horizontalDividerColor,
+                            contentAlignment = contentAlignment,
+                            textAlign = textAlign,
+                            tablePadding = tablePadding,
+                            columnToIndexIncreaseWidth = columnToIndexIncreaseWidth,
+                        )
+                    } else {
+                        TableRowComponent(
+                            data = rowData,
+                            rowBorderColor = rowBorderColor,
+                            dividerThickness = dividerThickness,
+                            rowTextStyle = rowTextStyle,
+                            rowBackGroundColor = tableRowBackgroundColor,
+                            contentAlignment = contentAlignment,
+                            textAlign = textAlign,
+                            tablePadding = tablePadding,
+                            columnToIndexIncreaseWidth = columnToIndexIncreaseWidth,
+                        )
+                    }
                 }
             }
         }
