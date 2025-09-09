@@ -18,6 +18,7 @@ package com.breens.beetablescompose
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -41,6 +42,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -61,9 +64,17 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainUi(modifier: Modifier = Modifier) {
+    val focusManager = LocalFocusManager.current
+
     Surface(
         color = MaterialTheme.colorScheme.background,
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .pointerInput(Unit) {
+                detectTapGestures {
+                    focusManager.clearFocus()
+                }
+            },
     ) {
         var disableVerticalDividers by remember {
             mutableStateOf(false)
@@ -92,6 +103,10 @@ fun MainUi(modifier: Modifier = Modifier) {
             mutableStateOf(false)
         }
 
+        var useInlineEditing by remember {
+            mutableStateOf(false)
+        }
+
         var editableTeams by remember {
             mutableStateOf(premierLeagueTeams.toMutableList())
         }
@@ -112,6 +127,7 @@ fun MainUi(modifier: Modifier = Modifier) {
                     contentAlignment = if (centerContent) Alignment.Center else Alignment.CenterStart,
                     textAlign = if (centerTextAlignment) TextAlign.Center else TextAlign.Start,
                     enableCellEditing = enableEditing,
+                    useInlineEditing = useInlineEditing,
                     onDataChange = { rowIndex, columnIndex, newValue ->
                         val updatedTeam = when (columnIndex) {
                             0 -> editableTeams[rowIndex].copy(name = newValue)
@@ -307,6 +323,28 @@ fun MainUi(modifier: Modifier = Modifier) {
                         checked = enableEditing,
                         onCheckedChange = {
                             enableEditing = it
+                        },
+                    )
+                }
+
+                Spacer(modifier = Modifier.padding(12.dp))
+            }
+
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Text(
+                        text = "Use Inline Editing",
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Switch(
+                        checked = useInlineEditing,
+                        enabled = enableEditing,
+                        onCheckedChange = {
+                            useInlineEditing = it
                         },
                     )
                 }

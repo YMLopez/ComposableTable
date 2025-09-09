@@ -29,6 +29,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.breens.beetablescompose.components.EditableTableRowComponent
+import com.breens.beetablescompose.components.InlineEditableTableRowComponent
 import com.breens.beetablescompose.components.TableHeaderComponent
 import com.breens.beetablescompose.components.TableHeaderComponentWithoutColumnDividers
 import com.breens.beetablescompose.components.TableRowComponent
@@ -59,6 +60,7 @@ import com.breens.beetablescompose.utils.lightGray
  * @param contentAlignment The alignment of the content in the table cells, by default it will be [Alignment.Center].
  * @param textAlign The alignment of the text in the table cells, by default it will be [TextAlign.Center].
  * @param enableCellEditing Enable or disable cell editing functionality, by default it will be false.
+ * @param useInlineEditing Enable inline editing (edit directly in cell) instead of dialog editing, by default it will be false.
  * @param onDataChange Callback function that will be called when cell data is changed. Only used when [enableCellEditing] is true.
  */
 @Composable
@@ -89,6 +91,7 @@ inline fun <reified T : Any> BeeTablesCompose(
     tablePadding: Dp = 0.dp,
     columnToIndexIncreaseWidth: Int? = null,
     enableCellEditing: Boolean = false,
+    useInlineEditing: Boolean = false,
     noinline onDataChange: ((rowIndex: Int, columnIndex: Int, newValue: String) -> Unit)? = null,
 ) {
     OutlinedCard(
@@ -137,21 +140,39 @@ inline fun <reified T : Any> BeeTablesCompose(
                 }
 
                 if (enableCellEditing) {
-                    EditableTableRowComponent(
-                        data = rowData,
-                        rowIndex = index,
-                        rowBorderColor = rowBorderColor,
-                        dividerThickness = dividerThickness,
-                        rowTextStyle = rowTextStyle,
-                        rowBackGroundColor = tableRowBackgroundColor,
-                        contentAlignment = contentAlignment,
-                        textAlign = textAlign,
-                        tablePadding = tablePadding,
-                        columnToIndexIncreaseWidth = columnToIndexIncreaseWidth,
-                        disableVerticalDividers = disableVerticalDividers,
-                        horizontalDividerColor = horizontalDividerColor,
-                        onDataChange = onDataChange,
-                    )
+                    if (useInlineEditing) {
+                        InlineEditableTableRowComponent(
+                            data = rowData,
+                            rowIndex = index,
+                            rowBorderColor = rowBorderColor,
+                            dividerThickness = dividerThickness,
+                            rowTextStyle = rowTextStyle,
+                            rowBackGroundColor = tableRowBackgroundColor,
+                            contentAlignment = contentAlignment,
+                            textAlign = textAlign,
+                            tablePadding = tablePadding,
+                            columnToIndexIncreaseWidth = columnToIndexIncreaseWidth,
+                            disableVerticalDividers = disableVerticalDividers,
+                            horizontalDividerColor = horizontalDividerColor,
+                            onDataChange = onDataChange,
+                        )
+                    } else {
+                        EditableTableRowComponent(
+                            data = rowData,
+                            rowIndex = index,
+                            rowBorderColor = rowBorderColor,
+                            dividerThickness = dividerThickness,
+                            rowTextStyle = rowTextStyle,
+                            rowBackGroundColor = tableRowBackgroundColor,
+                            contentAlignment = contentAlignment,
+                            textAlign = textAlign,
+                            tablePadding = tablePadding,
+                            columnToIndexIncreaseWidth = columnToIndexIncreaseWidth,
+                            disableVerticalDividers = disableVerticalDividers,
+                            horizontalDividerColor = horizontalDividerColor,
+                            onDataChange = onDataChange,
+                        )
+                    }
                 } else {
                     if (disableVerticalDividers) {
                         TableRowComponentWithoutDividers(
